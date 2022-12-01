@@ -7,8 +7,7 @@ import {
   Button,
 } from "react-native";
 import { Text, View } from "../components/Themed";
-import { gql } from "@apollo/client";
-import { useQuery, useLazyQuery } from "@apollo/client/react";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import BookItem from "../components/BookItem";
 
 const query = gql`
@@ -45,12 +44,34 @@ const query = gql`
 
 export default function TabOneScreen() {
   const [search, setSearch] = useState("");
+  const [provider, setProvider] = useState<
+    "googleBooksSearch" | "openLibrarySearch"
+  >("googleBooksSearch");
+
   const [runQuery, { data, loading, error }] = useLazyQuery(query);
 
   // Purpose of useLazyQuery is to prevent query spamming and only works when it's activated by the user
 
+  const parseBook = (item: any): Book => {
+    if (provider === "googleBooksSearch") {
+      return {
+        image: item.volumeInfo.imageLinks?.thumbnail,
+        title: item.volumeInfo.title,
+        authors: item.volumeInfo.authors,
+        isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier,
+      };
+    }
+    return {
+      image: `https://covers.openlibrary.org/b/olid/${item.cover_edition_key}-M.jpg`,
+      title: item.title,
+      authors: item.author_name,
+      isbn: item.isbn?.[0],
+    };
+  };
+
   return (
     <View style={styles.container}>
+      {/* SEARCH SECTION */}
       <View style={styles.header}>
         <TextInput
           value={search}
@@ -64,6 +85,31 @@ export default function TabOneScreen() {
         />
       </View>
 
+      {/* TABS SECTION */}
+      <View style={styles.tabs}>
+        <Text
+          style={
+            provider === "googleBooksSearch"
+              ? { fontWeight: "bold", color: "royalblue" }
+              : {}
+          }
+          onPress={() => setProvider("googleBooksSearch")}
+        >
+          Google Books
+        </Text>
+        <Text
+          style={
+            provider === "openLibrarySearch"
+              ? { fontWeight: "bold", color: "royalblue" }
+              : {}
+          }
+          onPress={() => setProvider("openLibrarySearch")}
+        >
+          Open Library
+        </Text>
+      </View>
+
+      {/* Loading Section + Error */}
       {loading && <ActivityIndicator />}
       {error && (
         <>
@@ -72,18 +118,13 @@ export default function TabOneScreen() {
         </>
       )}
       <FlatList
-        data={data?.googleBooksSearch?.items || []}
+        data={
+          (provider === "googleBooksSearch"
+            ? data?.googleBooksSearch?.items
+            : data?.openLibrarySearch.docs) || []
+        }
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <BookItem
-            book={{
-              image: item.volumeInfo.imageLinks?.thumbnail,
-              title: item.volumeInfo.title,
-              authors: item.volumeInfo.authors,
-              isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier,
-            }}
-          />
-        )}
+        renderItem={({ item }) => <BookItem book={parseBook(item)} />}
       />
     </View>
   );
@@ -114,5 +155,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 5,
     marginVertical: 5,
+  },
+  tabs: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    height: 50,
+    alignItems: "center",
   },
 });
