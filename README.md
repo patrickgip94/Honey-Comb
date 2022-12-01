@@ -1,14 +1,14 @@
 #  🍯 Honey Comb
 Honey Comb is a book app that's similar to [Goodreads](https://www.goodreads.com/) that will allow users to search for books and keep track of the books that they have read.
 
-## Screenshots
-### Search Page with Google Books API
-<img width="300" height="600" alt="screenshot" src="https://i.imgur.com/aZda7GW.png">
+### Screenshots
+## Search Page with Google Books API
+<img width="300" height="600" alt="screenshot" src="https://i.imgur.com/aZda7GW.png"> 
 
-### Search Page with Open Library API
-<img width="300" height="600" alt="screenshot" src="https://i.imgur.com/6VfQ0YD.png">
+## Search Page with Open Library API
+ <img width="300" height="600" alt="screenshot" src="https://i.imgur.com/6VfQ0YD.png">
 
-### Saved Books section
+## Saved Books section
 <img width="300" height="600" alt="screenshot" src="https://i.imgur.com/f7Q3u5L.png">
 
 
